@@ -1,6 +1,6 @@
 # Basic File I/O in Rust
 
-## Open file and write some some data
+## Open file and write some data
 
 ```rust
 use std::fs;
