@@ -1,4 +1,4 @@
-# Basic File I/O by Rust
+# Basic File I/O in Rust
 
 ## Open file and write some some data
 
@@ -255,31 +255,31 @@ The File header(the beginning of file) of BMP File is 14 bytes long with this in
 
 two important values in here are `FileSize` and `StartAddress`.
 
-`FileSize` is the size of BMP File on disk, `StartAddress` is the start address of pixel data 
+`FileSize` is the size of BMP File on disk, `StartAddress` is the start address of pixel data.
 
-if you use hex editor to see the content at `StartAddress`, you will see each pixel data store in pattern
+if you use hex editor to see the content at `StartAddress`, you will see each pixel data store in this pattern:
 
 ```
 [blue: u8] [green: u8] [red: u8] ....
 ```
 
-store in reverse order, from last row of pixels to first row of pixel. (Anyway, this is not important for this quiz)
+The color in each RGB channel is stored in reverse order. And the byte order is from last row of pixels to first row of pixel. (Anyway, this is not important for this quiz)
 
-To create inverse filter, we have to inverse bit to every pixel data in every bytes. (0 to 1, 1 to 0)
+To create inverse filter, we have to inverse bit of pixel data in every bytes. (0 to 1, 1 to 0)
 
-In rust, we have operator `!` 
+In rust, we can use operator `!` 
 
 ```rust
-let mut x: u8 = 254u8
+let mut x: u8 = 254u8;
 x = !x              // x is now 1
 
 // 254 (1111 1110) ---> 1 (0000 0001)
 ```
 
-That's all (maybe). I hope you have enough important information to implement.
+Ok, I hope you now have enough information to implement this program.
 
 ### Hint
- - In this case, we can skip working on DIB part (the content after header and before pixel data), but we have to copy all stuff to output file.
+ - In this case, we can skip working on Bitmap's DIB part (the content after header and before pixel data), but we still have to copy all of those bytes to output file.
  - You may have to use `seek` function
 
 More information about bitmap, you can look at [wiki](https://en.wikipedia.org/wiki/BMP_file_format)
