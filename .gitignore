@@ -1,0 +1,6 @@
+/target
+**/*.rs.bk
+
+test.txt
+party.json
+party.dat
