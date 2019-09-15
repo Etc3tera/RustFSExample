@@ -164,11 +164,10 @@ fn main() {
 ```
 
 ### Points
- - One downside thing, the output file `party.dat` is binary file, so we cannot open properly by Text Editor (You can try but it may display badly / missing plenty of information)
- - To open binary file, we use `Hex Editor`. there's many free stuffs:
+ - Because the output file `party.dat` is binary file, we cannot open normally by Text Editor (Truly, we can open but it may display badly / missing plenty of information)
+ - To properly open binary file, we use `Hex Editor`. there's many free stuffs:
    - [HxD](https://mh-nexus.de/en/hxd/)
    - [Online Hex Editor](https://hexed.it/)
- - After open binary file with Hex Editor we will see the content of file.
 
 ### Understanding Binary Encoding
 
@@ -190,17 +189,17 @@ And let's compare with the first 15 bytes for file
 07 00 00 00 00 00 00 00 46 6F 72 20 46 75 6E
 ```
 
-the part `46 6F 72 20 46 75 6E` in each bytes represent ASCII number of String 'For Fun'. and the front 8 bytes, is represent the length of this String. you may ask why use 8 bytes to store, it might be Rust (or bincode) use `u64` data format to store the lenght of string. (00 00 00 00 00 00 00 07 = 7 in decimal)
+the part `46 6F 72 20 46 75 6E` in each bytes represent ASCII number of String 'For Fun'. and the front 8 bytes, is represent the length of this String. Someone may ask why use 8 bytes to store, it might be Rust (or bincode) use `u64` data format to store the lenght of string. (00 00 00 00 00 00 00 07 is 7 in decimal format)
 
-Another thing, you might be interest is why it's in reversed order. The reason is bincode respect to computer's `Memory Layout`, it's use the same way that `u64` store in RAM.
+Another interesting, why it's in reversed order!! The reason is bincode respect to machine's `Memory Layout`, it's use the same way that `u64` store in RAM.
 
-Ok, let's see with next 8 bytes. It's `u64` again. By using method above, we got 
+Ok, let's see for next 8 bytes. It's `u64` again. By using method above, we got 
 
 03 00 00 00 00 00 00 00 ---> 3 (decimal)
 
 This is the size of `Party.members` vector, `bincode` store the size of vector before the real vector's content.
 
-Now, we have familiar to Binary File, so let's see more quickly. First item in vector is struct with data:
+Now, we have familiar to Binary File, so let's take more quickly. The first item in vector is struct with data:
 
 ```rust
 Player { 
@@ -210,6 +209,8 @@ Player {
     money: 10                   // u32
 }
 ```
+
+And here how stored in Hex form:
 
 ![Alice's Hex data](/hex_alice.png)
 
@@ -221,20 +222,22 @@ Player {
 0x0000000A = 10             ; money
 ```
 
-For the rest data, we can use the same method to decode.
+I will leave the rest of data for you to practice.
 
 ## Cautions about using binary file
 
-Binary file is small, and could be faster compare to Json Serialization but there's cautions
- - Binary file is hard to read by human and modify
- - If we change the structure of data, we cannot use that saved file anymore (without conversion or tweak logic). for example
+Binary file is small, and in most case it's run faster than Json Serialization but there's cautions
+ - Binary file is hard to read by human and cannot modify by text editor.
+ - If we change the structure of data, we can no longer use the saved file (without conversion or tweak logic). for example
    - Swap the order of struct's member
    - Change the size of struct's member
- - It's lack of universal comparing to JSON.
+ - It's lack of universal(no standard) comparing to JSON.
 
 # Homework (Playing with BMP File)
 
-Let's create `inverse` filter for `Bitmap File` (.bmp) by using Binary File I/O.
+Let's create `inverse` filter for `Bitmap File` (.bmp) by using Binary File I/O. 
+
+Your program read input bmp file, and create output bmp file which apply inverse filter.
 
 ![Filter result](filter.png)
 
@@ -273,6 +276,10 @@ x = !x              // x is now 1
 // 254 (1111 1110) ---> 1 (0000 0001)
 ```
 
-That's all. I think you have enough important information to implement. 
+That's all (maybe). I hope you have enough important information to implement.
+
+### Hint
+ - In this case, we can skip working on DIB part (the content after header and before pixel data), but we have to copy all stuff to output file.
+ - You may have to use `seek` function
 
 More information about bitmap, you can look at [wiki](https://en.wikipedia.org/wiki/BMP_file_format)
