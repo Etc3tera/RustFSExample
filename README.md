@@ -1,6 +1,6 @@
 # Basic File I/O in Rust
 
-## Open file and write some data
+## Opening a file and writing some data
 
 ```rust
 use std::fs;
@@ -31,21 +31,21 @@ fn main() {
 ```
 
 ### Points
- - We use `std::fs::OpenOptions` builder class to create `File` (file handle object).
- - `create(true)` mean create new file if not exists
- - `write(true)` to open file with write permission
- - After call `open(filepath)`, the builder class return `Result<File>`, we can handle an error here
- - `write_all` get bytes as input, and write to file.
- - File handle curson will be move after call `write_all`, but we can manually move it by `seek` function (because `File` implement Trait `io::Seek`)
- - `seek` receive parameter `SeekFrom` object in 3 variants
+ - We use the `std::fs::OpenOptions` builder class to create a `File` (file handle object).
+ - `create(true)` - create a new file if t does not exist
+ - `write(true)` - open file with write permission
+ - After calling `open(filepath)`, the builder class returns `Result<File>` - we can handle an error here
+ - `write_all` - get bytes as input, and write to file.
+ - File handle cursor will be repositioned after calling `write_all`, but we can manually move it with the `seek` function (because `File` implement Trait `io::Seek`)
+ - `seek` receives a parameter `SeekFrom` object in 3 variants
    - Start(u64) : Seek from beginning of file
    - Current(u64) : Seek from current position of `Cursor`
    - End(u64) : Current size of file plus position
- - File handle automatically close after lifetime of file handle object end. (In C/C++ we need to call fclose(FILE *fp) manually)
+ - The file handle automatically closes after the lifetime of file handle object ends. (In C/C++ we need to call fclose(FILE *fp) manually)
 
 ## Serialize/Deserialize file by JSON
 
-There're a wonderful library called `serde_json`. With this, we can easily/safety serialize/deserialize structure data to text format.
+There's a wonderful library called `serde_json`. With this, we can easily/safely serialize/deserialize structured data to a text format.
 
 ```rust
 use serde::{Deserialize, Serialize};
@@ -108,12 +108,12 @@ fn main() {
 ```
 
 ### Points
- - We use `serde_json::to_string(&str)` to encode struct to JSON, in the same way, we use `serde_json::from_str(&str)` to decode JSON back to struct.
- - To make struct serializable with serde, we need to derive macro call `Serialize` and `Deserialize` if we wish to deserialize.
+ - We use `serde_json::to_string(&str)` to encode struct to JSON, and in the same way, we use `serde_json::from_str(&str)` to decode JSON back to struct.
+ - To make structs serializable with serde, we need to `#[derive()]` the macro called `Serialize` and `Deserialize` for deserializing.
 
 ## Binary File with Rust
 
-To save struct with Binary-Encoded in Rust this can be done by using library called `bincode` combo with `serde`'s macro. we migrate our last code like this:
+Saving a struct with Binary-Encoding in Rust can be done using library called `bincode` combined with `serde`'s macro. We migrate our previous code as follows:
 
 ```rust
 use serde::{Deserialize, Serialize};
@@ -164,18 +164,18 @@ fn main() {
 ```
 
 ### Points
- - Because the output file `party.dat` is binary file, we cannot open normally by Text Editor (Truly, we can open but it may display badly / missing plenty of information)
- - To properly open binary file, we use `Hex Editor`. there's many free stuffs:
+ - Because the output file `party.dat` is binary file, we cannot open normally in a basic Text Editor (Actually, we can open but it may display badly and/or be missing lots of information)
+ - To properly open binary files, we use a `Hex Editor`. there are many free ones:
    - [HxD](https://mh-nexus.de/en/hxd/)
    - [Online Hex Editor](https://hexed.it/)
 
 ### Understanding Binary Encoding
 
-Let's dig more deeper on the result `bincode` serialization.
+Let's dig a bit deeper on the resulting `bincode` serialization.
 
 ![Data in Hex](/hex.png)
 
-For who may not familiar with hex editor, the two numbers in each columns represent one byte in file (in Haxadecimal). Let's see our serialized struct `Party` again.
+For those who may not familiar with hex editors, the two numbers in each of the columns represent one byte in file (in Haxadecimal). Let's look at our serialized struct `Party` again.
 
 ```rust
 struct Party {
@@ -189,17 +189,17 @@ And let's compare with the first 15 bytes for file
 07 00 00 00 00 00 00 00 46 6F 72 20 46 75 6E
 ```
 
-the part `46 6F 72 20 46 75 6E` in each bytes represent ASCII number of String 'For Fun'. and the front 8 bytes, is represent the length of this String. Someone may ask why use 8 bytes to store, it might be Rust (or bincode) use `u64` data format to store the lenght of string. (00 00 00 00 00 00 00 07 is 7 in decimal format)
+The part `46 6F 72 20 46 75 6E` in the bytes represents the ASCII number of String 'For Fun'. The first 8 bytes represents the length of this String. Someone may ask why use 8 bytes to store, it might be Rust (or bincode) use `u64` data format to store the lenght of string. (00 00 00 00 00 00 00 07 is 7 in decimal format)
 
-Another interesting, why it's in reversed order!! The reason is bincode respect to machine's `Memory Layout`, it's use the same way that `u64` store in RAM.
+Another interesting, why is its order reversed?! The reason is bincode respects the machine's `Memory Layout`, It's use the same layout, `u64`, as RAM storage.
 
-Ok, let's see for next 8 bytes. It's `u64` again. By using method above, we got 
+Ok, let's see for next 8 bytes. It's `u64` again.  By using method above, we got 
 
 03 00 00 00 00 00 00 00 ---> 3 (decimal)
 
-This is the size of `Party.members` vector, `bincode` store the size of vector before the real vector's content.
+This is the size of `Party.members` vector. `bincode` stores the size of vector before the real vector's content.
 
-Now, we have familiar to Binary File, so let's take more quickly. The first item in vector is struct with data:
+Now that we are familiar with binary files, let's take the next one more quickly. The first item in vector is a struct with data:
 
 ```rust
 Player { 
@@ -222,26 +222,26 @@ And here how stored in Hex form:
 0x0000000A = 10             ; money
 ```
 
-I will leave the rest of data for you to practice.
+I will leave the rest of the data for you to practice.
 
 ## Cautions about using binary file
 
-Binary file is small, and in most case it's run faster than Json Serialization but there's cautions
- - Binary file is hard to read by human and cannot modify by text editor.
- - If we change the structure of data, we can no longer use the saved file (without conversion or tweak logic). for example
+Binary files are smaller, and in most cases, faster than json serialization but there's some considerations: 
+ - Binary files are hard to read by humans and cannot be modified by text editors.
+ - If we change the structure of data, we can no longer use the saved file (without conversion or tweaking the read/write logic). For example:
    - Swap the order of struct's member
    - Change the size of struct's member
- - It's lack of universal(no standard) comparing to JSON.
+ - It lacks a universal standard format comparing to JSON.
 
-# Homework (Playing with BMP File)
+# Homework (Playing with a BMP File)
 
-Let's create `inverse` filter for `Bitmap File` (.bmp) by using Binary File I/O. 
+Let's create an `inverse` filter for `Bitmap File` (.bmp) by using Binary File I/O. 
 
-Your program read input bmp file, and create output bmp file which apply inverse filter.
+Your program reads an input bmp file, and creates an output bmp file, with the inverse filter applied.
 
 ![Filter result](filter.png)
 
-The Bitmap file is one of uncompressed image format. In this case we use normal `24-bit RGB` image.
+The Bitmap file is one of uncompressed image format. In this case we use a normal `24-bit RGB` image.
 The File header(the beginning of file) of BMP File is 14 bytes long with this information
 
 ```rust
@@ -263,11 +263,11 @@ if you use hex editor to see the content at `StartAddress`, you will see each pi
 [blue: u8] [green: u8] [red: u8] ....
 ```
 
-The color in each RGB channel is stored in reverse order. And the byte order is from last row of pixels to first row of pixel. (Anyway, this is not important for this quiz)
+The color in each RGB channel is stored in reverse order. And the byte order is from last row of pixels to first row of pixel. (Anyway, this is not important for our exercise)
 
-To create inverse filter, we have to inverse bit of pixel data in every bytes. (0 to 1, 1 to 0)
+To create an inverse filter, we have to invert the bit of pixel data in every bytes. (0 to 1, 1 to 0)
 
-In rust, we can use operator `!` 
+In rust, we can use the bitwise logical operator `!` 
 
 ```rust
 let mut x: u8 = 254u8;
